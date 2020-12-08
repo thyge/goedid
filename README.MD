@@ -1,1 +1,1 @@
-This is a work in progress
+If you are tired of the great user experience provided by CRU and want to dive one level deeper then this is the library for you
