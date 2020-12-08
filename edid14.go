@@ -219,9 +219,9 @@ func (e *Edid14) Encode() [128]byte {
 	returnBytes[21] = e.HorizontalScreenSizeCM
 	returnBytes[22] = e.HorizontalScreenSizeCM
 	// TODO: This is not correct
-	returnBytes[23] = byte((e.DisplayGamma) + 1*100)
+	returnBytes[23] = byte((e.DisplayGamma - 1) * 100)
 	returnBytes[24] = byte(e.DPMS) << 5
-	returnBytes[24] = returnBytes[21] | byte(e.DisplayType)<<3
+	returnBytes[24] = returnBytes[24] | byte(e.DisplayType)<<3
 	// Chromaticity coordinates.
 	// returnBytes[25:34]
 
@@ -461,8 +461,11 @@ func (v VideoInterface) MarshalJSON() ([]byte, error) {
 type ManufacturerID string
 
 func (s ManufacturerID) String() string {
-	pnp := pnpLookup[string(s)]
-	return pnp.Company
+	if pnp, ok := pnpLookup[string(s)]; ok {
+		return pnp.Company
+	} else {
+		return string(s)
+	}
 }
 func (s ManufacturerID) MarshalJSON() ([]byte, error) {
 	buffer := bytes.NewBufferString(`"`)
@@ -473,11 +476,10 @@ func (s ManufacturerID) MarshalJSON() ([]byte, error) {
 
 func (s ManufacturerID) Encode() [2]byte {
 	var retBytes [2]byte
-	pnp := pnpLookup[string(s)]
-	retBytes[0] = (pnp.ID[0] - 0x40) << 2
-	retBytes[0] = retBytes[0] | (pnp.ID[1]-0x40)>>3
-	retBytes[1] = (pnp.ID[1] - 0x40) << 5
-	retBytes[1] = retBytes[1] | (pnp.ID[2] - 0x40)
+	retBytes[0] = (s[0] - 0x40) << 2
+	retBytes[0] = retBytes[0] | (s[1]-0x40)>>3
+	retBytes[1] = (s[1] - 0x40) << 5
+	retBytes[1] = retBytes[1] | (s[2] - 0x40)
 	return retBytes
 }
 
