@@ -551,7 +551,7 @@ type DetailedTimingDescriptor struct {
 	VerticalBorder           byte
 	Interlaced               bool
 	Stereo                   StereoMode
-	SyncType                 string
+	SyncType                 SyncType
 	HorizontalSyncPolarity   SyncPolarity
 	VerticalSyncPolarity     SyncPolarity
 	data                     [18]byte
@@ -591,16 +591,8 @@ func DecodeDTD(edidBytes *[18]byte) DetailedTimingDescriptor {
 	d.VerticalSyncPolarity = ((edidBytes[17] & 0x4) >> 2) > 0
 	d.HorizontalSyncPolarity = ((edidBytes[17] & 0x2) >> 1) > 0
 
-	switch syncBits {
-	case 0:
-		d.SyncType = "Analog composite"
-	case 1:
-		d.SyncType = "Bipolar analog composite"
-	case 2:
-		d.SyncType = "Digital composite (on HSync)"
-	case 3:
-		d.SyncType = "Digital separate"
-	}
+	d.SyncType = SyncType(syncBits)
+
 	stereoMode := (edidBytes[17] & 0x61)
 	d.Stereo = StereoMode(stereoMode)
 
@@ -618,8 +610,8 @@ func (dtd *DetailedTimingDescriptor) Encode() [18]byte {
 	returnBytes[5] = byte(dtd.VerticalActive & 0xFF)
 	returnBytes[6] = byte(dtd.VerticalBlanking & 0xFF)
 
-	returnBytes[4] = byte(dtd.HorizontalBlanking&0xF000>>12 | dtd.HorizontalActive&0x0F00>>8)
-	returnBytes[7] = byte(dtd.VerticalBlanking&0xF000>>12 | dtd.VerticalActive&0x0F00>>8)
+	returnBytes[4] = byte(dtd.HorizontalBlanking&0x0F00>>8 | dtd.HorizontalActive&0x0F00>>4)
+	returnBytes[7] = byte(dtd.VerticalBlanking&0xF000>>8 | dtd.VerticalActive&0x0F00>>4)
 
 	returnBytes[8] = byte(dtd.HorizontalFrontPorch)
 	returnBytes[9] = byte(dtd.HorizontalSyncPulseWidth)
@@ -642,6 +634,8 @@ func (dtd *DetailedTimingDescriptor) Encode() [18]byte {
 		returnBytes[17] = returnBytes[17] | 0x80
 	}
 	returnBytes[17] |= byte(dtd.Stereo)
+	returnBytes[17] |= byte(dtd.SyncType) << 3
+
 	// force Digital sync., separate
 	if dtd.VerticalSyncPolarity == SYNC_ON_POSITIVE {
 		returnBytes[17] |= 0x4
@@ -678,6 +672,33 @@ func (sp SyncPolarity) String() string {
 func (sp SyncPolarity) MarshalJSON() ([]byte, error) {
 	buffer := bytes.NewBufferString(`"`)
 	buffer.WriteString(sp.String())
+	buffer.WriteString(`"`)
+	return buffer.Bytes(), nil
+}
+
+type SyncType byte
+
+const (
+	AnalogComposite        SyncType = 0
+	BipolarAnalogComposite SyncType = 1
+	DigitalComposite       SyncType = 2
+	DigitalSeparate        SyncType = 3
+)
+
+var syncTypeLookup = map[SyncType]string{
+	AnalogComposite:        "Analog composite",
+	BipolarAnalogComposite: "Bipolar analog composite",
+	DigitalComposite:       "Digital composite (on HSync)",
+	DigitalSeparate:        "Digital separate",
+}
+
+func (st SyncType) String() string {
+	return syncTypeLookup[st]
+}
+
+func (st SyncType) MarshalJSON() ([]byte, error) {
+	buffer := bytes.NewBufferString(`"`)
+	buffer.WriteString(st.String())
 	buffer.WriteString(`"`)
 	return buffer.Bytes(), nil
 }

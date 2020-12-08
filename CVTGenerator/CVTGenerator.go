@@ -205,6 +205,7 @@ func GenerateCVT_RB2(hAct int, vAct int, hz float64,
 	}
 
 	dtd := new(edid.DetailedTimingDescriptor)
+	dtd.SyncType = edid.DigitalSeparate // Does this need to be dynamic?
 	dtd.PixelClockKHz = uint32(ACT_PIXEL_FREQ * 100)
 	dtd.HorizontalActive = uint16(TOTAL_ACTIVE_PIXELS)
 	dtd.HorizontalBlanking = uint16(H_BLANK)
@@ -220,5 +221,18 @@ func GenerateCVT_RB2(hAct int, vAct int, hz float64,
 	dtd.HorizontalTotal = int(TOTAL_PIXELS)
 	dtd.VerticalTotal = int(TOTAL_V_LINES)
 	dtd.ACT_FRAME_RATE = ACT_FRAME_RATE
+
+	switch typ {
+	case CVT:
+		dtd.VerticalSyncPolarity = true
+		dtd.HorizontalSyncPolarity = false
+	case CVT_RB, CVT_RB2:
+		dtd.VerticalSyncPolarity = false
+		dtd.HorizontalSyncPolarity = true
+	default:
+		dtd.VerticalSyncPolarity = true
+		dtd.HorizontalSyncPolarity = true
+	}
+
 	return *dtd
 }
