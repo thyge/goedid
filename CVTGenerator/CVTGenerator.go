@@ -2,6 +2,8 @@ package CVTGenerator
 
 import (
 	"math"
+
+	edid "github.com/thyge/goedid"
 )
 
 // // CVT - RB
@@ -83,7 +85,7 @@ var timingLookup = map[CVTTimingType]TimingConstaints{
 }
 
 func GenerateCVT_RB2(hAct int, vAct int, hz float64,
-	margins bool, interlaced bool, typ CVTTimingType) DetailedTimingDescriptor {
+	margins bool, interlaced bool, typ CVTTimingType) edid.DetailedTimingDescriptor {
 
 	H_PIXELS := hAct
 	V_LINES := vAct
@@ -202,7 +204,7 @@ func GenerateCVT_RB2(hAct int, vAct int, hz float64,
 		ACT_FRAME_RATE = ACT_FIELD_RATE
 	}
 
-	dtd := new(DetailedTimingDescriptor)
+	dtd := new(edid.DetailedTimingDescriptor)
 	dtd.PixelClockKHz = uint32(ACT_PIXEL_FREQ * 100)
 	dtd.HorizontalActive = uint16(TOTAL_ACTIVE_PIXELS)
 	dtd.HorizontalBlanking = uint16(H_BLANK)
