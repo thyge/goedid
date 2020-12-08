@@ -1,8 +1,10 @@
-package edid
+package eedid
 
 import (
 	"bytes"
 	"fmt"
+
+	edid "github.com/thyge/goedid"
 )
 
 type EEDID struct {
@@ -61,42 +63,25 @@ func DecodeEDID(edidBytes []byte) ([]interface{}, error) {
 	var decodedExtensions []interface{}
 
 	etyp := EEDID{Type: ExtensionType(0x01)}
-	edi, _ := ParseEdid14(edidBytes[0:127])
+	edi, _ := edid.ParseEdid14(edidBytes[0:127])
 	etyp.Extension = edi
 	decodedExtensions = append(decodedExtensions, etyp)
 	for i := 128; i < len(edidBytes); i += 128 {
-		switch edidBytes[i] {
-		case 0x02:
-			cea, err := DecodeCEA(edidBytes[i : i+128])
+		etyp := EEDID{Type: ExtensionType(edidBytes[i])}
+		switch etyp.Type {
+		case CEAExtension:
+			cea, err := edid.DecodeCEA(edidBytes[i : i+128])
 			if err != nil {
 				return nil, err
 			}
-			etyp := EEDID{Type: ExtensionType(edidBytes[i])}
 			etyp.Extension = cea
 			decodedExtensions = append(decodedExtensions, etyp)
-		case 0x10:
-			fmt.Println("Video Timing Block Extension")
-		case 0x20:
-			fmt.Println("EDID 2.0 Extension")
-		case 0x40:
-			fmt.Println("Display Information Extension")
-		case 0x50:
-			fmt.Println("Localized String Extension")
-		case 0x60:
-			fmt.Println("Microdisplay Interface Extension (MI-EXT)")
-		case 0x70:
-			did := DecodeDisplayID(edidBytes[i : i+128])
-			etyp := EEDID{Type: ExtensionType(edidBytes[i])}
+		case DisplayIDExtension:
+			did := edid.DecodeDisplayID(edidBytes[i : i+128])
 			etyp.Extension = did
 			decodedExtensions = append(decodedExtensions, etyp)
-		case 0xA7, 0xAF, 0xBF:
-			fmt.Println("Display Transfer Characteristics Data Block (DTCDB)")
-		case 0xF0:
-			fmt.Println("Block Map")
-		case 0xFF:
-			fmt.Println("Display Device Data Block (DDDB)")
 		default:
-			fmt.Println("Unsupported extension")
+			fmt.Println("EDID Decoder not supported for:", etyp)
 		}
 	}
 	return decodedExtensions, nil

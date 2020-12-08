@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	edid "github.com/thyge/goedid"
+	"github.com/thyge/goedid/eedid"
 )
 
 var (
@@ -32,7 +32,7 @@ func main() {
 		log.Fatal("Unable to read file ", err)
 	}
 
-	decodedEDID, err := edid.DecodeEDID(edidBytes)
+	decodedEDID, err := eedid.DecodeEDID(edidBytes)
 	if err != nil {
 		log.Fatal("Unable to decode EDID ", err)
 	}
