@@ -1,4 +1,4 @@
-package edid
+package eedid
 
 import (
 	"bytes"

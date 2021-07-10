@@ -1,4 +1,4 @@
-package edid
+package eedid
 
 var pnpLookup = map[string]PNPID{
 	"TTL": PNPID{

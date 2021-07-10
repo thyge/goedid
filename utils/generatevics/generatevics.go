@@ -15,7 +15,7 @@ var (
 
 func main() {
 	in, err := ioutil.ReadFile(*ceafile)
-	f, err := os.Create("../../edid/vics.go")
+	f, err := os.Create("vics.go")
 	if err != nil {
 		return
 	}

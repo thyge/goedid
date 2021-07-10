@@ -2,8 +2,6 @@ package CVTGenerator
 
 import (
 	"math"
-
-	edid "github.com/thyge/goedid"
 )
 
 // // CVT - RB

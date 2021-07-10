@@ -17,7 +17,7 @@ var (
 
 func main() {
 	in, err := ioutil.ReadFile(*pnpfile)
-	f, err := os.Create("../../edid/pnps.go")
+	f, err := os.Create("pnps.go")
 	if err != nil {
 		return
 	}

@@ -10,11 +10,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/thyge/goedid/eedid"
+	"github.com/thyge/goedid/pkg/eedid"
 )
 
 var (
-	edidfile = flag.String("edidfile", "./edid.bin", "path to edid file")
+	edidfile = flag.String("edidfile", "./2160.txt", "path to edid file")
 )
 
 func main() {

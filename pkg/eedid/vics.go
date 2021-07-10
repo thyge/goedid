@@ -1,4 +1,4 @@
-package edid
+package eedid
 
 var vicLooup = map[byte]CEAResulution{
 	1: CEAResulution{

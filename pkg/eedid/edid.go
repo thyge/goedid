@@ -3,8 +3,6 @@ package eedid
 import (
 	"bytes"
 	"fmt"
-
-	edid "github.com/thyge/goedid"
 )
 
 type EEDID struct {
@@ -63,21 +61,21 @@ func DecodeEDID(edidBytes []byte) ([]interface{}, error) {
 	var decodedExtensions []interface{}
 
 	etyp := EEDID{Type: ExtensionType(0x01)}
-	edi, _ := edid.ParseEdid14(edidBytes[0:127])
+	edi, _ := ParseEdid14(edidBytes[0:127])
 	etyp.Extension = edi
 	decodedExtensions = append(decodedExtensions, etyp)
 	for i := 128; i < len(edidBytes); i += 128 {
 		etyp := EEDID{Type: ExtensionType(edidBytes[i])}
 		switch etyp.Type {
 		case CEAExtension:
-			cea, err := edid.DecodeCEA(edidBytes[i : i+128])
+			cea, err := DecodeCEA(edidBytes[i : i+128])
 			if err != nil {
 				return nil, err
 			}
 			etyp.Extension = cea
 			decodedExtensions = append(decodedExtensions, etyp)
 		case DisplayIDExtension:
-			did := edid.DecodeDisplayID(edidBytes[i : i+128])
+			did := DecodeDisplayID(edidBytes[i : i+128])
 			etyp.Extension = did
 			decodedExtensions = append(decodedExtensions, etyp)
 		default:
