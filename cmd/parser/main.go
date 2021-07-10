@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	edidfile = flag.String("edidfile", "./2160.txt", "path to edid file")
+	edidfile = flag.String("edidfile", "./RQ50K_ET-MDNHM10_4K_60p_HDR.txt", "path to edid file")
 )
 
 func main() {
@@ -43,6 +43,7 @@ func main() {
 
 func GetBytesFromString(str string) ([]byte, error) {
 	str = strings.Replace(str, " ", "", -1)
+	str = strings.Replace(str, ",", "", -1)
 	str = strings.Replace(str, "\r\n", "", -1)
 	str = strings.Replace(str, "\n", "", -1)
 	str = strings.TrimSpace(str)
